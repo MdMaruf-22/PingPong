@@ -2,6 +2,7 @@ package com.example.pingpong;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,7 +24,7 @@ public class GameView extends View {
     float ballX,ballY;
     Velocity velocity = new Velocity(25,32);
     Handler handler;
-    final long UODATE=30;
+    final long UPDATE=30;
     Runnable runnable;
     Paint textPaint = new Paint();
     Paint healthPaint = new Paint();
@@ -73,5 +74,60 @@ public class GameView extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
+        canvas.drawColor(Color.BLACK);
+        ballX += velocity.getX();
+        ballY += velocity.getY();
+        if(ballX <= 0 || ballX >= dWidth-ball.getWidth()){
+            velocity.setX(velocity.getX() * -1);
+        }
+        if(ballY <= 0 ){
+            velocity.setY(velocity.getY() * -1);
+        }
+        if(ballY > paddleY + paddle.getHeight()){
+            ballX = 1 + random.nextInt(dWidth - ball.getWidth() -1 );
+            ballY = 0;
+            if(mMiss != null && audioState){
+                mMiss.start();
+            }
+            velocity.setX(xVelocity());
+            velocity.setY(32);
+            life--;
+            if(life == 0){
+                Intent intent = new Intent(context,GameOver.class);
+                intent.putExtra("points",points);
+                context.startActivity(intent);
+                ((Activity)context).finish();
+            }
+        }
+        if(((ballX + ball.getWidth()) >= paddleX)
+        && (ballX <= paddleX + paddle.getWidth())
+        && (ballY + ball.getHeight() >= paddleY)
+        && (ballY + ball.getHeight() <= paddleY + paddle.getHeight())){
+            if(mHit != null && audioState){
+                mHit.start();
+            }
+            velocity.setX(velocity.getX() + 1);
+            velocity.setY(velocity.getY() + 1);
+            points++;
+            canvas.drawBitmap(ball,ballX,ballY,null);
+            canvas.drawBitmap(paddle,paddleX,paddleY,null);
+            canvas.drawText(""+points,20,textSize,textPaint);
+            if(life == 2){
+                healthPaint.setColor((Color.YELLOW));
+            }
+            else if(life == 1){
+                healthPaint.setColor((Color.RED));
+            }
+            canvas.drawRect(dWidth-200, 30, dWidth-200 + 60 * life , 80, healthPaint);
+            handler.postDelayed(runnable , UPDATE);
+        }
+
+
+    }
+
+    private int xVelocity() {
+        int[] values = {-35, -30, -25, 25, 30, 35};
+        int index = random.nextInt(6);
+        return values[index];
     }
 }
