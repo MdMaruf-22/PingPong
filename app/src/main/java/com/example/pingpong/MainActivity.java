@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity{
         GameView gameView = new GameView(this);
         setContentView(gameView);
     }
-
     public void audioPref(View view) {
         if(audioState){
             audioState = false;
