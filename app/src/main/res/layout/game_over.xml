@@ -15,15 +15,18 @@
             android:layout_height="wrap_content"
             android:background="@drawable/restart"
             android:onClick="restart" />
+
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:layout_weight="1" />
+
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/exit"
             android:onClick="exit" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -37,8 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/new_highest"
-            android:visibility="gone">
-        </ImageView>
+            android:visibility="gone"></ImageView>
 
         <TableLayout
             android:layout_width="wrap_content"
@@ -47,41 +49,39 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:gravity="center">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Your points: "
-                    android:textSize="24sp">
-                </TextView>
+                    android:text="Your Points: "
+                    android:textSize="24sp"></TextView>
                 <TextView
                     android:id="@+id/tvPoints"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="50"
                     android:textSize="50sp"
-                    android:textColor="@android:color/holo_green_dark">
-                </TextView>
+                    android:textColor="@android:color/holo_green_dark"></TextView>
             </TableRow>
-
             <TableRow
                 android:layout_width="match_parent"
                 android:gravity="center">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Highest: "
                     android:textSize="24sp"
-                    android:layout_gravity="center|right">
-                </TextView>
+                    android:layout_gravity="center|right"></TextView>
                 <TextView
                     android:id="@+id/tvHighest"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="100"
                     android:textSize="50sp"
-                    android:textColor="@android:color/holo_orange_dark">
-                </TextView>
+                    android:textColor="@android:color/holo_orange_dark"></TextView>
             </TableRow>
+
         </TableLayout>
         <View
             android:layout_width="1dp"

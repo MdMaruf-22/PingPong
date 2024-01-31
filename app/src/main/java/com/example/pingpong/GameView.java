@@ -11,52 +11,50 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
-import android.os.Handler;
-import androidx.annotation.NonNull;
 
 import java.util.Random;
 
-
 public class GameView extends View {
     Context context;
-    float ballX,ballY;
-    Velocity velocity = new Velocity(25,32);
+    float ballX, ballY;
+    Velocity velocity = new Velocity(25, 32);
     Handler handler;
-    final long UPDATE=30;
+    final long UPDATE_MILLIS = 30;
     Runnable runnable;
     Paint textPaint = new Paint();
     Paint healthPaint = new Paint();
-    float textSize = 120;
-    float paddleX,paddleY;
-    float oldX,oldPaddleX;
-    int points = 30;
+    float TEXT_SIZE = 120;
+    float paddleX, paddleY;
+    float oldX, oldPaddleX;
+    int points = 0;
     int life = 3;
-    Bitmap ball,paddle;
-    int dWidth,dHeight;
-    MediaPlayer mHit,mMiss;
+    Bitmap ball, paddle;
+    int dWidth, dHeight;
+    MediaPlayer mpHit, mpMiss;
     Random random;
     SharedPreferences sharedPreferences;
     Boolean audioState;
 
-
-    public GameView(Context context){
+    public GameView(Context context) {
         super(context);
         this.context = context;
-        ball = BitmapFactory.decodeResource(getResources(),R.drawable.ball);
-        paddle = BitmapFactory.decodeResource(getResources(),R.drawable.paddle);
+        ball = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
+        paddle = BitmapFactory.decodeResource(getResources(), R.drawable.paddle);
+        handler = new Handler();
         runnable = new Runnable() {
             @Override
             public void run() {
                 invalidate();
             }
         };
-        mHit = MediaPlayer.create(context,R.raw.hit);
-        mMiss = MediaPlayer.create(context,R.raw.miss);
+        mpHit = MediaPlayer.create(context, R.raw.hit);
+        mpMiss = MediaPlayer.create(context, R.raw.miss);
         textPaint.setColor(Color.RED);
-        textPaint.setTextSize(textSize);
+        textPaint.setTextSize(TEXT_SIZE);
         textPaint.setTextAlign(Paint.Align.LEFT);
         healthPaint.setColor(Color.GREEN);
         Display display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
@@ -66,64 +64,61 @@ public class GameView extends View {
         dHeight = size.y;
         random = new Random();
         ballX = random.nextInt(dWidth);
-        paddleY = (dHeight * 4)/5;
-        paddleX = dWidth/2 - paddle.getWidth();
-        sharedPreferences = context.getSharedPreferences("my_pref",0);
-        audioState = sharedPreferences.getBoolean("audioState",true);
+        paddleY = (dHeight * 4) / 5;
+        paddleX = dWidth / 2 - paddle.getWidth() /2;
+        sharedPreferences = context.getSharedPreferences("my_pref", 0);
+        audioState = sharedPreferences.getBoolean("audioState", true);
     }
 
     @Override
-    protected void onDraw(@NonNull Canvas canvas) {
+    protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawColor(Color.BLACK);
         ballX += velocity.getX();
         ballY += velocity.getY();
-        if(ballX <= 0 || ballX >= dWidth-ball.getWidth()){
+        if((ballX >= dWidth - ball.getWidth()) || ballX <= 0){
             velocity.setX(velocity.getX() * -1);
         }
-        if(ballY <= 0 ){
+        if(ballY <= 0){
             velocity.setY(velocity.getY() * -1);
         }
         if(ballY > paddleY + paddle.getHeight()){
-            ballX = 1 + random.nextInt(dWidth - ball.getWidth() -1 );
+            ballX = 1 + random.nextInt(dWidth - ball.getWidth() -1);
             ballY = 0;
-            if(mMiss != null && audioState){
-                mMiss.start();
+            if(mpMiss != null && audioState){
+                mpMiss.start();
             }
             velocity.setX(xVelocity());
             velocity.setY(32);
             life--;
             if(life == 0){
-                Intent intent = new Intent(context,GameOver.class);
-                intent.putExtra("points",points);
+                Intent intent = new Intent(context, GameOver.class);
+                intent.putExtra("points", points);
                 context.startActivity(intent);
                 ((Activity)context).finish();
             }
         }
-        if(((ballX + ball.getWidth()) >= paddleX)
-        && (ballX <= paddleX + paddle.getWidth())
-        && (ballY + ball.getHeight() >= paddleY)
-        && (ballY + ball.getHeight() <= paddleY + paddle.getHeight())){
-            if(mHit != null && audioState){
-                mHit.start();
+        if(((ballX+ball.getWidth()) >= paddleX)
+                && (ballX <= paddleX + paddle.getWidth())
+                && (ballY + ball.getHeight() >= paddleY)
+                && (ballY + ball.getHeight() <= paddleY + paddle.getHeight())){
+            if(mpHit != null && audioState){
+                mpHit.start();
             }
             velocity.setX(velocity.getX() + 1);
-            velocity.setY(velocity.getY() + 1);
+            velocity.setY((velocity.getY() + 1) * -1);
             points++;
-            canvas.drawBitmap(ball,ballX,ballY,null);
-            canvas.drawBitmap(paddle,paddleX,paddleY,null);
-            canvas.drawText(""+points,20,textSize,textPaint);
-            if(life == 2){
-                healthPaint.setColor((Color.YELLOW));
-            }
-            else if(life == 1){
-                healthPaint.setColor((Color.RED));
-            }
-            canvas.drawRect(dWidth-200, 30, dWidth-200 + 60 * life , 80, healthPaint);
-            handler.postDelayed(runnable , UPDATE);
         }
-
-
+        canvas.drawBitmap(ball, ballX, ballY, null);
+        canvas.drawBitmap(paddle, paddleX, paddleY, null);
+        canvas.drawText(""+points, 20, TEXT_SIZE, textPaint);
+        if(life == 2){
+            healthPaint.setColor(Color.YELLOW);
+        }else if(life == 1){
+            healthPaint.setColor(Color.RED);
+        }
+        canvas.drawRect(dWidth-200, 30,dWidth - 200 + 60*life, 80, healthPaint);
+        handler.postDelayed(runnable, UPDATE_MILLIS);
     }
 
     @Override
@@ -139,20 +134,16 @@ public class GameView extends View {
             if(action == MotionEvent.ACTION_MOVE){
                 float shift = oldX - touchX;
                 float newPaddleX = oldPaddleX - shift;
-                if(newPaddleX <= 0){
-                    paddleX=0;
-                }
-                else if(newPaddleX >= dWidth - paddle.getWidth()){
+                if(newPaddleX <= 0)
+                    paddleX = 0;
+                else if(newPaddleX >= dWidth - paddle.getWidth())
                     paddleX = dWidth - paddle.getWidth();
-                }
-                else{
+                else
                     paddleX = newPaddleX;
-                }
             }
         }
         return true;
     }
-
     private int xVelocity() {
         int[] values = {-35, -30, -25, 25, 30, 35};
         int index = random.nextInt(6);

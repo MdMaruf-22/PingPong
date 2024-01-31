@@ -1,10 +1,10 @@
 package com.example.pingpong;
 
 public class Velocity {
-    private int x,y;
-    public Velocity(int i, int i1) {
-        this.x=i;
-        this.y=i1;
+    private int x, y;
+    public Velocity(int x, int y){
+        this.x = x;
+        this.y = y;
     }
 
     public int getX() {
